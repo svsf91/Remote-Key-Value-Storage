@@ -7,8 +7,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public abstract class Server{
-    Logger logger;
-    Map<String, String> map;
+    protected Logger logger;
+    private Map<String, String> map;
 
     public Server() throws Exception {
         logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
