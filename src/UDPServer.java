@@ -3,23 +3,31 @@ import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.logging.Level;
 
 public class UDPServer extends Server {
-    byte[] incomingData;
-    DatagramSocket datagramSocket;
-    int port;
+    private DatagramSocket datagramSocket;
+    private int clientPort;
+    private InetAddress inetAddress;
 
     public UDPServer(DatagramSocket datagramSocket, int port) {
-        this.incomingData = new byte[1024];
         this.datagramSocket = datagramSocket;
-        this.port = port;
+        try {
+            inetAddress = InetAddress.getByName("localhost");
+        } catch (UnknownHostException e) {
+            logger.log(Level.WARNING, "Unknow host");
+        }
     }
 
     @Override
     public SocketData receiveSocketData() throws Exception {
-        DatagramPacket datagramPacket = new DatagramPacket(incomingData, incomingData.length);
+        byte[] data = new byte[1024];
+        DatagramPacket datagramPacket = new DatagramPacket(data, data.length);
         datagramSocket.receive(datagramPacket);
-        byte[] data = datagramPacket.getData();
+        clientPort = datagramPacket.getPort();
+        data = datagramPacket.getData();
+        System.out.println("Received");
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
         ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
         SocketData socketData = (SocketData) objectInputStream.readObject();
@@ -27,9 +35,22 @@ public class UDPServer extends Server {
     }
 
     @Override
-    public void sendString(String message) throws Exception{
+    public void sendString(String message) throws Exception {
         byte[] data = message.getBytes();
-        InetAddress inetAddress = InetAddress.getByName("localhost");
-        DatagramPacket datagramPacket = new DatagramPacket(data, data.length, inetAddress)
+        DatagramPacket datagramPacket = new DatagramPacket(data, data.length, inetAddress, clientPort);
+        datagramSocket.send(datagramPacket);
+    }
+
+    public static void main(String[] args) {
+        int port = readPort();
+        try {
+            DatagramSocket datagramSocket = new DatagramSocket(port);
+            UDPServer udpServer = new UDPServer(datagramSocket, port);
+            System.out.println("Connected");
+            udpServer.execute();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            UDPServer.logger.log(Level.WARNING, "Error creating socket");
+        }
     }
 }

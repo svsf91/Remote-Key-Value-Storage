@@ -1,15 +1,16 @@
-import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public abstract class Server {
-    protected Logger logger;
+    protected static Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     private Map<String, String> map;
+    private static BufferedReader systemBufferedReader;
 
     public Server() {
-        logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
         map = new HashMap<>();
     }
 
@@ -51,10 +52,40 @@ public abstract class Server {
                     }
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 logger.log(Level.WARNING, "Disconnected");
                 break;
             }
         }
+    }
+
+    public static String readString() {
+        if (systemBufferedReader == null) {
+            systemBufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        }
+        String message;
+        while (true) {
+            try {
+                message = systemBufferedReader.readLine();
+                break;
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Error reading input, enter again");
+            }
+        }
+        return message;
+    }
+
+    public static int readPort() {
+        int port;
+        while(true) {
+            try {
+                System.out.println("Enter port");
+                port = Integer.parseInt(readString());
+                break;
+            } catch (Exception e) {
+            }
+        }
+        return port;
     }
 }
 

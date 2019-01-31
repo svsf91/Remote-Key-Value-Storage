@@ -4,37 +4,40 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class TCPClient extends Client {
-    BufferedReader systemBufferedReader;
-    Logger logger;
-    BufferedReader bufferedReader;
-    ObjectOutputStream objectOutputStream;
+    private BufferedReader bufferedReader;
+    private ObjectOutputStream objectOutputStream;
 
-    public TCPClient(Socket socket) throws Exception {
-        systemBufferedReader = new BufferedReader(new InputStreamReader(System.in));
-        objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-        bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    public TCPClient(Socket socket) {
+        try {
+            objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+            bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        } catch(IOException e) {
+            logger.log(Level.WARNING, "Disconnected");
+        }
     }
 
     @Override
     public void sendSocketData(SocketData socketData) throws Exception {
         objectOutputStream.writeObject(socketData);
         objectOutputStream.flush();
-        logger.log(Level.WARNING, "Error sending SocketData");
     }
 
     @Override
     public String receiveString() throws Exception {
         String message = bufferedReader.readLine();
-        logger.log(Level.WARNING, "Error receiving message");
         return message;
     }
 
 
-    public static void main(String[] args) throws Exception {
-        Socket socket = new Socket("localhost", 1234);
-        TCPClient tcpClient = new TCPClient(socket);
-        System.out.println(tcpClient.receiveString());
-        tcpClient.execute();
+    public static void main(String[] args) {
+        int port = readPort();
+        try {
+            Socket socket = new Socket("localhost", port);
+            TCPClient tcpClient = new TCPClient(socket);
+            System.out.println(tcpClient.receiveString());
+            tcpClient.execute();
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Error connecting to server");
+        }
     }
 }

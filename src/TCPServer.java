@@ -1,18 +1,19 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Level;
 
 public class TCPServer extends Server {
-    private BufferedReader systemBufferedReader;
-    private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
     private ObjectInputStream objectInputStream;
 
-    public TCPServer(Socket socket) throws Exception {
-        systemBufferedReader = new BufferedReader(new InputStreamReader(System.in));
-        objectInputStream = new ObjectInputStream(socket.getInputStream());
-        bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+    public TCPServer(Socket socket) {
+        try {
+            objectInputStream = new ObjectInputStream(socket.getInputStream());
+            bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Disconnected");
+        }
     }
 
     @Override
@@ -29,16 +30,19 @@ public class TCPServer extends Server {
         bufferedWriter.flush();
     }
 
-    public static void main(String[] args) throws Exception {
-        ServerSocket serverSocket = new ServerSocket(1234);
-        while (true) {
-            Socket socket = serverSocket.accept();
-            System.out.println("Connected");
-            TCPServer tcpServer = new TCPServer(socket);
-            tcpServer.bufferedWriter.write("Connected");
-            tcpServer.bufferedWriter.newLine();
-            tcpServer.bufferedWriter.flush();
-            tcpServer.execute();
+    public static void main(String[] args) {
+        int port = readPort();
+        try {
+            ServerSocket serverSocket = new ServerSocket(port);
+            while (true) {
+                Socket socket = serverSocket.accept();
+                System.out.println("Connected");
+                TCPServer tcpServer = new TCPServer(socket);
+                tcpServer.sendString("Connected");
+                tcpServer.execute();
+            }
+        } catch(Exception e) {
+            logger.log(Level.WARNING, "Error creating socket");
         }
     }
 }
