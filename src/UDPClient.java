@@ -23,6 +23,7 @@ public class UDPClient extends Client {
         }
     }
 
+    // Implementation of sending SocketData via UDP socket
     @Override
     public void sendSocketData(SocketData socketData) throws Exception {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -33,6 +34,7 @@ public class UDPClient extends Client {
         datagramSocket.send(datagramPacket);
     }
 
+    // Implementation of receiving String via UDP socket
     @Override
     public String receiveString() throws Exception {
         byte[] data = new byte[1024];

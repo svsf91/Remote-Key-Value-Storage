@@ -16,6 +16,7 @@ public class TCPServer extends Server {
         }
     }
 
+    // Implementation of receiving Socket Data via TCP socket
     @Override
     public SocketData receiveSocketData() throws Exception {
         SocketData socketData = null;
@@ -23,6 +24,7 @@ public class TCPServer extends Server {
         return socketData;
     }
 
+    // Implementation of sending String via TCP socket
     @Override
     public void sendString(String message) throws Exception {
         bufferedWriter.write(message);

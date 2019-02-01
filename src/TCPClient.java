@@ -7,6 +7,7 @@ public class TCPClient extends Client {
     private BufferedReader bufferedReader;
     private ObjectOutputStream objectOutputStream;
 
+
     public TCPClient(Socket socket) {
         try {
             objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
@@ -16,12 +17,14 @@ public class TCPClient extends Client {
         }
     }
 
+    // Implementation of sending Socket Data via TCP socket
     @Override
     public void sendSocketData(SocketData socketData) throws Exception {
         objectOutputStream.writeObject(socketData);
         objectOutputStream.flush();
     }
 
+    // Implementation of receiving String via TCP socket
     @Override
     public String receiveString() throws Exception {
         String message = bufferedReader.readLine();

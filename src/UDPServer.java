@@ -20,6 +20,7 @@ public class UDPServer extends Server {
         }
     }
 
+    // Implementation of receiving SocketData through UDP socket
     @Override
     public SocketData receiveSocketData() throws Exception {
         byte[] data = new byte[1024];
@@ -34,6 +35,7 @@ public class UDPServer extends Server {
         return socketData;
     }
 
+    // Implementation of sending String through UDP socket
     @Override
     public void sendString(String message) throws Exception {
         byte[] data = message.getBytes();
