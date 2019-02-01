@@ -31,9 +31,15 @@ public class TCPServer extends Server {
     }
 
     public static void main(String[] args) {
-        int port = readPort();
+        int port = 0;
+        try {
+            port = Integer.parseInt(args[0]);
+        } catch (NumberFormatException e) {
+            logger.log(Level.WARNING, "Invalid port");
+        }
         try {
             ServerSocket serverSocket = new ServerSocket(port);
+            logger.log(Level.INFO, "Listening to port " + port);
             while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println("Connected");

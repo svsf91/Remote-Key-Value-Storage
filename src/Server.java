@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+// Abstract class implementing general methods for TCP and UDP server
 public abstract class Server {
     protected static Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     private Map<String, String> map;
@@ -18,6 +19,10 @@ public abstract class Server {
 
     public abstract void sendString(String message) throws Exception;
 
+    /*
+    Process SocketData sent from Client.
+    Manage data with HashMap.
+     */
     public void execute() {
         while (true) {
             SocketData socketData;
@@ -27,27 +32,33 @@ public abstract class Server {
                 switch (socketData.operation) {
                     case "GET": {
                         if (!map.containsKey(socketData.key)) {
+                            logger.log(Level.WARNING, "Key does not exist");
                             sendString("Key does not exist");
                         } else {
-                            sendString(map.get(socketData.key));
+                            logger.log(Level.WARNING, "Key does not exist");
+                            sendString("Value is " + map.get(socketData.key));
                         }
                         break;
                     }
                     case "PUT": {
                         map.put(socketData.key, socketData.value);
+                        logger.log(Level.WARNING, String.format("%s, %s stored", socketData.key, socketData.value));
                         sendString(String.format("%s, %s stored", socketData.key, socketData.value));
                         break;
                     }
                     case "DELETE": {
                         if (!map.containsKey(socketData.key)) {
+                            logger.log(Level.WARNING, "Key does not exist");
                             sendString("Key does not exist");
                         } else {
+                            logger.log(Level.WARNING, "Removed " + socketData.key + ", " + map.get(socketData.key));
                             sendString("Removed " + socketData.key + ", " + map.get(socketData.key));
                             map.remove(socketData.key);
                         }
                         break;
                     }
                     default: {
+                        logger.log(Level.WARNING, "Invalid operation");
                         sendString("Invalid operation");
                     }
                 }
@@ -59,6 +70,7 @@ public abstract class Server {
         }
     }
 
+    // Read string from command line input
     public static String readString() {
         if (systemBufferedReader == null) {
             systemBufferedReader = new BufferedReader(new InputStreamReader(System.in));
@@ -75,17 +87,5 @@ public abstract class Server {
         return message;
     }
 
-    public static int readPort() {
-        int port;
-        while(true) {
-            try {
-                System.out.println("Enter port");
-                port = Integer.parseInt(readString());
-                break;
-            } catch (Exception e) {
-            }
-        }
-        return port;
-    }
 }
 

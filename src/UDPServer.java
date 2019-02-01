@@ -27,7 +27,7 @@ public class UDPServer extends Server {
         datagramSocket.receive(datagramPacket);
         clientPort = datagramPacket.getPort();
         data = datagramPacket.getData();
-        System.out.println("Received");
+        logger.log(Level.INFO, String.format("Received data of length %s from %s:%s", datagramPacket.getLength(), datagramPacket.getAddress(), datagramPacket.getPort()));
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
         ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
         SocketData socketData = (SocketData) objectInputStream.readObject();
@@ -42,9 +42,15 @@ public class UDPServer extends Server {
     }
 
     public static void main(String[] args) {
-        int port = readPort();
+        int port = 0;
+        try {
+            port = Integer.parseInt(args[0]);
+        } catch (NumberFormatException e) {
+            logger.log(Level.WARNING, "Invalid port");
+        }
         try {
             DatagramSocket datagramSocket = new DatagramSocket(port);
+            logger.log(Level.INFO, "Listening to port " + port);
             UDPServer udpServer = new UDPServer(datagramSocket, port);
             System.out.println("Connected");
             udpServer.execute();

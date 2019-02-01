@@ -1,9 +1,6 @@
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.logging.Level;
 
 public class UDPClient extends Client {
@@ -13,11 +10,16 @@ public class UDPClient extends Client {
 
     public UDPClient(DatagramSocket datagramSocket, int port) {
         this.datagramSocket = datagramSocket;
+        try {
+            this.datagramSocket.setSoTimeout(10000);
+        } catch (SocketException e) {
+            logger.log(Level.WARNING, "Error setting timeout");
+        }
         this.port = port;
         try {
             inetAddress = InetAddress.getByName("localhost");
         } catch (UnknownHostException e) {
-            logger.log(Level.WARNING, "Unknow host");
+            logger.log(Level.WARNING, "Unknown host");
         }
     }
 
@@ -36,11 +38,19 @@ public class UDPClient extends Client {
         byte[] data = new byte[1024];
         DatagramPacket datagramPacket = new DatagramPacket(data, data.length);
         datagramSocket.receive(datagramPacket);
+        logger.log(Level.INFO, String.format("Received String '%s' from %s:%s", new String(datagramPacket.getData()), datagramPacket.getAddress(), datagramPacket.getPort()));
         return new String(datagramPacket.getData());
     }
 
     public static void main(String[] args) {
-        int port = readPort();
+        int port = 0;
+        String hostname = null;
+        try {
+            hostname = args[0];
+            port = Integer.parseInt(args[1]);
+        } catch (NumberFormatException e) {
+            logger.log(Level.WARNING, "Invalid hostname or port");
+        }
         try {
             DatagramSocket datagramSocket = new DatagramSocket();
             UDPClient udpClient = new UDPClient(datagramSocket, port);

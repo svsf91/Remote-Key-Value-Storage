@@ -30,9 +30,16 @@ public class TCPClient extends Client {
 
 
     public static void main(String[] args) {
-        int port = readPort();
+        int port = 0;
+        String hostname = null;
         try {
-            Socket socket = new Socket("localhost", port);
+            hostname = args[0];
+            port = Integer.parseInt(args[1]);
+        } catch (NumberFormatException e) {
+            logger.log(Level.WARNING, "Invalid hostname or port");
+        }
+        try {
+            Socket socket = new Socket(hostname, port);
             TCPClient tcpClient = new TCPClient(socket);
             System.out.println(tcpClient.receiveString());
             tcpClient.execute();
