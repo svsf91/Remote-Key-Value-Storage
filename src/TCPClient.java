@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,6 +15,11 @@ public class TCPClient extends Client {
             bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } catch(IOException e) {
             logger.log(Level.WARNING, "Disconnected");
+        }
+        try {
+            socket.setSoTimeout(10000);
+        } catch (SocketException e) {
+            logger.log(Level.WARNING, "Error setting timeout");
         }
     }
 
