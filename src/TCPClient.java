@@ -16,6 +16,7 @@ public class TCPClient extends Client {
         } catch(IOException e) {
             logger.log(Level.WARNING, "Disconnected");
         }
+        // Set socket timeout
         try {
             socket.setSoTimeout(10000);
         } catch (SocketException e) {

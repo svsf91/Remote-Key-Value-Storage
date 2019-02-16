@@ -3,7 +3,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
 
-public class TCPServer extends Server {
+public class TCPServer extends Server implements Runnable {
     private BufferedWriter bufferedWriter;
     private ObjectInputStream objectInputStream;
 
@@ -14,6 +14,12 @@ public class TCPServer extends Server {
         } catch (Exception e) {
             logger.log(Level.WARNING, "Disconnected");
         }
+    }
+
+    @Override
+    public void run() {
+        logger.log(Level.INFO, Thread.currentThread().getName());
+        execute();
     }
 
     // Implementation of receiving Socket Data via TCP socket
@@ -47,7 +53,7 @@ public class TCPServer extends Server {
                 System.out.println("Connected");
                 TCPServer tcpServer = new TCPServer(socket);
                 tcpServer.sendString("Connected");
-                tcpServer.execute();
+                new Thread(tcpServer).start();
             }
         } catch(Exception e) {
             logger.log(Level.WARNING, "Error creating socket");

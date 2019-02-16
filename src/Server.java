@@ -63,7 +63,6 @@ public abstract class Server {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
                 logger.log(Level.WARNING, "Disconnected");
                 break;
             }
